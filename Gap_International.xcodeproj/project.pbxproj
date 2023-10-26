@@ -18,9 +18,12 @@
 		2F0460182ADF27D300C8E9C2 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0460172ADF27D300C8E9C2 /* MainContentView.swift */; };
 		2F04601A2ADF284300C8E9C2 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0460192ADF284300C8E9C2 /* APIService.swift */; };
 		2F04601C2ADF287300C8E9C2 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F04601B2ADF287300C8E9C2 /* LoginView.swift */; };
-		2F1ED5D92AE2E976000D1AE6 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F1ED5D82AE2E976000D1AE6 /* Test.swift */; };
 		2F1ED5DD2AE30672000D1AE6 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F1ED5DC2AE30672000D1AE6 /* JournalView.swift */; };
-		2F412B4C2AE6DB71005EB585 /* gap.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F412B4B2AE6DB71005EB585 /* gap.png */; };
+		2F627A2B2AE6FC0000C56C7F /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F627A2A2AE6FC0000C56C7F /* CommentModel.swift */; };
+		2F627A2E2AE6FC6200C56C7F /* JournalController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F627A2D2AE6FC6200C56C7F /* JournalController.swift */; };
+		2F627A312AE6FD7D00C56C7F /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F627A302AE6FD7D00C56C7F /* LoginController.swift */; };
+		2F627A332AE86BC900C56C7F /* ChapterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F627A322AE86BC900C56C7F /* ChapterModel.swift */; };
+		2F627A352AE86C2D00C56C7F /* MainContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F627A342AE86C2D00C56C7F /* MainContentViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,9 +58,12 @@
 		2F0460172ADF27D300C8E9C2 /* MainContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		2F0460192ADF284300C8E9C2 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		2F04601B2ADF287300C8E9C2 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
-		2F1ED5D82AE2E976000D1AE6 /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		2F1ED5DC2AE30672000D1AE6 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
-		2F412B4B2AE6DB71005EB585 /* gap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = gap.png; path = ../../gap.png; sourceTree = "<group>"; };
+		2F627A2A2AE6FC0000C56C7F /* CommentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
+		2F627A2D2AE6FC6200C56C7F /* JournalController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalController.swift; sourceTree = "<group>"; };
+		2F627A302AE6FD7D00C56C7F /* LoginController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
+		2F627A322AE86BC900C56C7F /* ChapterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterModel.swift; sourceTree = "<group>"; };
+		2F627A342AE86C2D00C56C7F /* MainContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,16 +114,12 @@
 		2F045FEA2AD9A96000C8E9C2 /* Gap_International */ = {
 			isa = PBXGroup;
 			children = (
-				2F412B4B2AE6DB71005EB585 /* gap.png */,
+				2F627A2F2AE6FCE800C56C7F /* View */,
+				2F627A2C2AE6FC5400C56C7F /* Controller */,
+				2F627A292AE6FBF300C56C7F /* Model */,
 				2F045FEB2AD9A96000C8E9C2 /* Gap_InternationalApp.swift */,
-				2F045FED2AD9A96000C8E9C2 /* ContentView.swift */,
 				2F0460152AD9AB8E00C8E9C2 /* Chapters.plist */,
 				2F045FEF2AD9A96300C8E9C2 /* Assets.xcassets */,
-				2F0460172ADF27D300C8E9C2 /* MainContentView.swift */,
-				2F0460192ADF284300C8E9C2 /* APIService.swift */,
-				2F04601B2ADF287300C8E9C2 /* LoginView.swift */,
-				2F1ED5D82AE2E976000D1AE6 /* Test.swift */,
-				2F1ED5DC2AE30672000D1AE6 /* JournalView.swift */,
 				2F045FF12AD9A96300C8E9C2 /* Preview Content */,
 			);
 			path = Gap_International;
@@ -146,6 +148,37 @@
 				2F0460082AD9A96300C8E9C2 /* Gap_InternationalUITestsLaunchTests.swift */,
 			);
 			path = Gap_InternationalUITests;
+			sourceTree = "<group>";
+		};
+		2F627A292AE6FBF300C56C7F /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2F627A2A2AE6FC0000C56C7F /* CommentModel.swift */,
+				2F627A322AE86BC900C56C7F /* ChapterModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		2F627A2C2AE6FC5400C56C7F /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				2F0460192ADF284300C8E9C2 /* APIService.swift */,
+				2F627A2D2AE6FC6200C56C7F /* JournalController.swift */,
+				2F627A302AE6FD7D00C56C7F /* LoginController.swift */,
+				2F627A342AE86C2D00C56C7F /* MainContentViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		2F627A2F2AE6FCE800C56C7F /* View */ = {
+			isa = PBXGroup;
+			children = (
+				2F0460172ADF27D300C8E9C2 /* MainContentView.swift */,
+				2F1ED5DC2AE30672000D1AE6 /* JournalView.swift */,
+				2F04601B2ADF287300C8E9C2 /* LoginView.swift */,
+				2F045FED2AD9A96000C8E9C2 /* ContentView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -254,7 +287,6 @@
 			files = (
 				2F0460162AD9AB8E00C8E9C2 /* Chapters.plist in Resources */,
 				2F045FF32AD9A96300C8E9C2 /* Preview Assets.xcassets in Resources */,
-				2F412B4C2AE6DB71005EB585 /* gap.png in Resources */,
 				2F045FF02AD9A96300C8E9C2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -281,12 +313,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				2F045FEE2AD9A96000C8E9C2 /* ContentView.swift in Sources */,
+				2F627A2E2AE6FC6200C56C7F /* JournalController.swift in Sources */,
+				2F627A352AE86C2D00C56C7F /* MainContentViewController.swift in Sources */,
 				2F045FEC2AD9A96000C8E9C2 /* Gap_InternationalApp.swift in Sources */,
 				2F04601A2ADF284300C8E9C2 /* APIService.swift in Sources */,
+				2F627A312AE6FD7D00C56C7F /* LoginController.swift in Sources */,
+				2F627A332AE86BC900C56C7F /* ChapterModel.swift in Sources */,
 				2F04601C2ADF287300C8E9C2 /* LoginView.swift in Sources */,
+				2F627A2B2AE6FC0000C56C7F /* CommentModel.swift in Sources */,
 				2F1ED5DD2AE30672000D1AE6 /* JournalView.swift in Sources */,
 				2F0460182ADF27D300C8E9C2 /* MainContentView.swift in Sources */,
-				2F1ED5D92AE2E976000D1AE6 /* Test.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

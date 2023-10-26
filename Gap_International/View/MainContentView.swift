@@ -10,12 +10,6 @@ import AVKit
 import AVFoundation
 import Combine
 
-struct Chapter: Identifiable {
-    var id = UUID()
-    var name: String
-    var videoURL: URL
-}
-
 struct CommentPopover: View {
     @Binding var selectedChapter: Chapter?
     @Binding var commentInput: String
@@ -84,6 +78,7 @@ struct VideoControlBar: View {
     var nextAction: () -> Void
     var pipAction: () -> Void
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @Binding var isVideoOver: Bool
     
     var body: some View {
         HStack {
@@ -108,9 +103,7 @@ struct VideoControlBar: View {
                     print("Current time: \(currentTime) s")
                     if(currentTime > duration - 1 && currentTime < duration){
                         print("Video over")
-                        let alert = UIAlertController(title: "Video Complete.", message: "Please leave a comment before proceeding to the next chapter.", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
+                        isVideoOver = true
                     }
                 }
             })
@@ -121,7 +114,7 @@ struct VideoControlBar: View {
                 Image(systemName: "arrow.left.circle")
                     .font(.title)
             }
-                        
+            
             Button(action: {
                 nextAction()
             }) {
@@ -146,20 +139,22 @@ struct VideoControlBar: View {
 
 struct MainContentView: View {
     @State private var isChapterMenuVisible = true
-    @State private var selectedChapter: Chapter?
-    @State private var chapters: [Chapter] = []
-    @State private var player: AVPlayer?
+    //   @State private var selectedChapter: Chapter?
+    //    @State private var player: AVPlayer?
     @State private var userComment = ""
     @Binding var isLoggedIn: Bool
     var username: String
     @State private var isPlaying = false
-    @State private var currentTime = 0.0
-    @State private var duration = 0.0
-    @State private var selectedChapterIndex: Int = 0
+    //  @State private var currentTime = 0.0
+    //    @State private var duration = 0.0
+    //    @State private var selectedChapterIndex: Int = 0
     @State private var commentInput = ""
-    @State private var isCommentPopoverPresented = false
-    @State private var hasCommented = false
+    @State var isCommentPopoverPresented = false
+    //   @State private var hasCommented = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    //    @State private var isVideoOver = false
+    @StateObject var controller = MainContentViewController()
+    
     
     var body: some View {
         NavigationView {
@@ -168,29 +163,9 @@ struct MainContentView: View {
                     // Sidebar (Chapter Menu)
                     if isChapterMenuVisible {
                         VStack {
-                            List(chapters) { chapter in
+                            List(controller.chapters) { chapter in
                                 Button(action: {
-                                    if hasCommented {
-                                        if selectedChapterIndex < chapters.count - 1 {
-                                            if currentTime >= duration {
-                                                selectedChapterIndex += 1
-                                                selectedChapter = chapters[selectedChapterIndex]
-                                                player = AVPlayer(url: selectedChapter!.videoURL)
-                                                self.duration = selectedChapter!.videoDuration()
-                                                
-                                                hasCommented = false
-                                                print("Selected chapter: \(selectedChapter?.name ?? "N/A")")
-                                            } else {
-                                                let alert = UIAlertController(title: "Video Not Fully Watched", message: "Please ensure the current video is fully watched before proceeding to the next chapter.", preferredStyle: .alert)
-                                                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                                                UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
-                                            }
-                                        }
-                                    } else {
-                                        let alert = UIAlertController(title: "Comment Required", message: "Please leave a comment before proceeding to the next chapter.", preferredStyle: .alert)
-                                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                                        UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
-                                    }
+                                    controller.sideBar()
                                 }) {
                                     HStack {
                                         Text(chapter.name)
@@ -213,8 +188,7 @@ struct MainContentView: View {
                     
                     VStack() {
                         HStack {
-                            if isPortrait() {
-                                
+                            if controller.isPortrait() {
                                 Button(action: {
                                     withAnimation {
                                         isChapterMenuVisible.toggle()
@@ -246,94 +220,64 @@ struct MainContentView: View {
                         
                         .frame(maxWidth: .infinity, maxHeight: 80)
                         
-                        if selectedChapterIndex < chapters.count {
-                            VStack {
-                                Text(selectedChapter?.name ?? "")
-                                    .font(.largeTitle)
-                                
-                                VideoPlayer(player: player) {
-                                }
-                                .onReceive([isPlaying].publisher) { _ in
-                                    if isPlaying {
-                                        player?.play()
-                                    } else {
-                                        player?.pause()
+                        if controller.selectedChapterIndex < controller.chapters.count {
+                            ZStack{
+                                VStack {
+                                    
+                                    Text(controller.selectedChapter?.name ?? "")
+                                        .font(.largeTitle)
+                                    
+                                    VideoPlayer(player: controller.player) {
                                     }
-                                }
-                                .frame(width: 700, height: 500)
-                                .background(Color(.systemGray6))
-                                
-                                VideoControlBar(isPlaying: $isPlaying, currentTime: $currentTime, player: player, duration: $duration, seekAction: { newTime in
-                                    player!.seek(to: CMTime(seconds: newTime, preferredTimescale: 1))
-                                }, previousAction: {
-                                    if selectedChapterIndex > 0 {
-                                        print("Going to the previous chapter")
-                                        
-                                        selectedChapterIndex -= 1
-                                        selectedChapter = chapters[selectedChapterIndex]
-                                        player = AVPlayer(url: selectedChapter!.videoURL)
-                                        self.duration = selectedChapter!.videoDuration()
-                                        print("Selected chapter: \(selectedChapter?.name ?? "N/A")")
-                                    }
-                                }, nextAction: {
-                                    if hasCommented {
-                                        if selectedChapterIndex < chapters.count - 1 {
-                                            print("Going to the next chapter")
-                                            selectedChapterIndex += 1
-                                            selectedChapter = chapters[selectedChapterIndex]
-                                            player = AVPlayer(url: selectedChapter!.videoURL)
-                                            self.duration = selectedChapter!.videoDuration()
-                                            hasCommented = false
-                                            print("Selected chapter: \(selectedChapter?.name ?? "N/A")")
+                                    .onReceive([isPlaying].publisher) { _ in
+                                        if isPlaying {
+                                            controller.player?.play()
+                                        } else {
+                                            controller.player?.pause()
                                         }
-                                    } else {
-                                        let alert = UIAlertController(title: "Comment Required", message: "Please leave a comment before proceeding to the next chapter.", preferredStyle: .alert)
-                                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                                        UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
                                     }
-                                }, pipAction: {
-                                })
-                                Button(action: {
-                                    guard currentTime >= duration else {
-                                        let alert = UIAlertController(title: "Video Not Fully Watched", message: "Cannot save comment until the video is fully over.", preferredStyle: .alert)
-                                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                                        UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
-                                        return
-                                    }
-                                    isCommentPopoverPresented = true
-                                    hasCommented = true
-                                }) {
-                                    Text("Leave A Comment")
-                                        .padding()
-                                        .background(Color.blue)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(8)
+                                    .frame(width: 700, height: 500)
+                                    .background(Color(.systemGray6))
+                                    
+                                    VideoControlBar(isPlaying: $isPlaying, currentTime: $controller.currentTime, player: controller.player, duration: $controller.duration, seekAction: { newTime in
+                                        controller.player!.seek(to: CMTime(seconds: newTime, preferredTimescale: 1))
+                                    }, previousAction: {
+                                        controller.prevAction()
+                                    }, nextAction: {
+                                        controller.nextAction()
+                                    }, pipAction: {
+                                    }, isVideoOver: $controller.isVideoOver)
+                                    
+                                    Text("A description of the video.")
+                                        .font(.subheadline)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                 }
-                                .popover(isPresented: $isCommentPopoverPresented, content: {
-                                    CommentPopover(selectedChapter: $selectedChapter, commentInput: $commentInput) {
+                                if controller.isVideoOver {
+                                    CommentPopover(selectedChapter: $controller.selectedChapter, commentInput: $commentInput) {
                                         saveComment()
+                                        controller.isVideoOver = false
+                                        controller.hasCommented = true
                                     }
-                                })
-                                
-                                Text("A description of the video.")
-                                    .font(.subheadline)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                }
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .onAppear {
-                                self.duration = selectedChapter!.videoDuration()
-                                player = AVPlayer(url: selectedChapter!.videoURL)
+                                self.controller.duration = controller.selectedChapter!.videoDuration()
+                                controller.player = AVPlayer(url: controller.selectedChapter!.videoURL)
                             }
+                            
                         }
+                        
                     }
+                    
                     .padding()
                 }
             }
             .background(Color(.systemGray4))
             .edgesIgnoringSafeArea(.all)
             .onAppear {
-                loadChaptersFromPlist()
-                selectedChapter = chapters.first
+                controller.loadChaptersFromPlist()
+                controller.selectedChapter = controller.chapters.first
             }
             .navigationBarTitle("")
             .navigationBarHidden(true)
@@ -341,37 +285,20 @@ struct MainContentView: View {
         .navigationViewStyle(StackNavigationViewStyle())
     }
     
-    func isPortrait() -> Bool {
-        return UIDevice.current.orientation.isPortrait
-    }
-    
-    func loadChaptersFromPlist() {
-        if let plistURL = Bundle.main.url(forResource: "Chapters", withExtension: "plist"),
-           let data = try? Data(contentsOf: plistURL),
-           let plist = try? PropertyListSerialization.propertyList(from: data, options: [], format: nil),
-           let dict = plist as? [String: Any],
-           let chaptersArray = dict["Chapters"] as? [[String: String]] {
-            chapters = chaptersArray.compactMap { chapterDict in
-                if let name = chapterDict["name"], let urlString = chapterDict["url"], let videoURL = URL(string: urlString) {
-                    return Chapter(name: name, videoURL: videoURL)
-                }
-                return nil
-            }
-        }
-    }
-    
     func saveComment() {
-        guard let selectedChapter = selectedChapter, !commentInput.isEmpty else {
+        guard let selectedChapter = controller.selectedChapter, !commentInput.isEmpty else {
             return
         }
         
         let apiService = APIService()
         apiService.saveComment(username: username, chapterName: selectedChapter.name, comment: commentInput, level: 1) { result in
-            switch result {
-            case .success(let response):
-                print("Comment saved successfully: \(response)")
-            case .failure(let error):
-                print("Error saving comment: \(error)")
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let response):
+                    print("Comment saved successfully: \(response)")
+                case .failure(let error):
+                    print("Error saving comment: \(error)")
+                }
             }
         }
     }

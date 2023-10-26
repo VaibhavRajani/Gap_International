@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct LoginView: View {
-    @ObservedObject var controller: LoginController
-    @ObservedObject var apiService: APIService
-    @State private var isSignUp = false
-
+    @ObservedObject var controller = LoginController()
+    @Binding var username: String
+    @Binding var password: String
     
     var body: some View {
         NavigationLink("", destination: EmptyView())
@@ -22,23 +21,22 @@ struct LoginView: View {
                 .frame(width: 500, height: 200)
                 .padding()
             
-            if isSignUp {
-                TextField("Username", text: $signUpUsername)
+            if controller.isSignUp {
+                TextField("Username", text: $controller.signUpUsername)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
-                SecureField("Password", text: $signUpPassword)
+                SecureField("Password", text: $controller.signUpPassword)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
                 Button("Sign Up") {
-                    controller.signUp(signUpUsername: signUpUsername, signUpPassword: signUpPassword)
-
+                    controller.signUp(username: username, password: password)
                 }
                 .buttonStyle(DefaultButtonStyle(backgroundColor: Color.gray))
                 
                 Button("Back to Login") {
-                    isSignUp = false
+                    controller.isSignUp = false
                 }
                 .buttonStyle(DefaultButtonStyle(backgroundColor: Color.gray))
             } else {
@@ -52,19 +50,19 @@ struct LoginView: View {
                 
                 HStack {
                     Button("Login") {
-                        controller.login()
+                        controller.logIn(username: username, password: password)
                     }
                     .buttonStyle(DefaultButtonStyle(backgroundColor: Color.gray))
                     
                     Button("Sign Up") {
-                        isSignUp.toggle()
+                        controller.isSignUp.toggle()
                     }
                     .buttonStyle(DefaultButtonStyle(backgroundColor: Color.gray))
                 }
             }
         }
         .navigationBarHidden(true)
-        .alert(isPresented: $isShowingAlert) {
+        .alert(isPresented: $controller.isShowingAlert) {
             Alert(
                 title: Text("Login Error"),
                 message: Text("Incorrect username or password. Please try again."),

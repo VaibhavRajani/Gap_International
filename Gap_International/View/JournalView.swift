@@ -11,7 +11,7 @@ struct JournalView: View {
     @Binding var isLoggedIn: Bool
     var username: String
 
-    @ObservedObject var controller = JournalController()
+    @StateObject var controller = JournalController()
 
     @State private var selectedComment: Comment?
 

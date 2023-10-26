@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct Chapter: Identifiable {
+    var id = UUID()
+    var name: String
+    var videoURL: URL
+}
