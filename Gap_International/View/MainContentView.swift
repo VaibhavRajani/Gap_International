@@ -43,7 +43,6 @@ struct CommentPopover: View {
                             .stroke(Color.gray, lineWidth: 1)
                     )
                     .padding(.horizontal)
-                //        .focused($isTextFieldFocused)
                     .background(Color.white)
                     .cornerRadius(8)
                     .onTapGesture {
@@ -68,7 +67,6 @@ struct CommentPopover: View {
         }
         .opacity(isPopoverPresented ? 1 : 0)
         .onTapGesture {
-            // Close the popover when tapping outside of it
             isTextFieldFocused = false
             isPopoverPresented = false
         }
@@ -86,7 +84,6 @@ struct VideoControlBar: View {
     var nextAction: () -> Void
     var pipAction: () -> Void
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    //  var videoIsOver: Bool
     
     var body: some View {
         HStack {
@@ -124,9 +121,7 @@ struct VideoControlBar: View {
                 Image(systemName: "arrow.left.circle")
                     .font(.title)
             }
-            
-            // Spacer()
-            
+                        
             Button(action: {
                 nextAction()
             }) {
@@ -154,15 +149,15 @@ struct MainContentView: View {
     @State private var selectedChapter: Chapter?
     @State private var chapters: [Chapter] = []
     @State private var player: AVPlayer?
-    @State private var userComment = "" // Input for user's comment
+    @State private var userComment = ""
     @Binding var isLoggedIn: Bool
     var username: String
     @State private var isPlaying = false
     @State private var currentTime = 0.0
     @State private var duration = 0.0
-    @State private var selectedChapterIndex: Int = 0 // Keep track of the selected chapter index
+    @State private var selectedChapterIndex: Int = 0
     @State private var commentInput = ""
-    @State private var isCommentPopoverPresented = false // 2. State to present the comment popover
+    @State private var isCommentPopoverPresented = false
     @State private var hasCommented = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
@@ -177,13 +172,13 @@ struct MainContentView: View {
                                 Button(action: {
                                     if hasCommented {
                                         if selectedChapterIndex < chapters.count - 1 {
-                                            if currentTime >= duration { // Check if the current video is fully watched
+                                            if currentTime >= duration {
                                                 selectedChapterIndex += 1
                                                 selectedChapter = chapters[selectedChapterIndex]
                                                 player = AVPlayer(url: selectedChapter!.videoURL)
                                                 self.duration = selectedChapter!.videoDuration()
                                                 
-                                                hasCommented = false // Reset hasCommented to false for the next chapter
+                                                hasCommented = false
                                                 print("Selected chapter: \(selectedChapter?.name ?? "N/A")")
                                             } else {
                                                 let alert = UIAlertController(title: "Video Not Fully Watched", message: "Please ensure the current video is fully watched before proceeding to the next chapter.", preferredStyle: .alert)
@@ -203,9 +198,8 @@ struct MainContentView: View {
                                             .padding(.vertical, 30)
                                         Image(systemName: "chevron.right")
                                     }
-                                   // .background(Color.gray) // Add a background color to the button
                                 }
-                                .listRowBackground(Color(red: 74/255, green: 92/255, blue: 142/255)) // Hot Pink Color)
+                                .listRowBackground(Color(red: 74/255, green: 92/255, blue: 142/255))
                                 .listRowSeparatorTint(.white)
                             }
                             .listStyle(SidebarListStyle())
@@ -217,54 +211,47 @@ struct MainContentView: View {
                         }
                     }
                     
-                    
-                    
-                    // Main Content
                     VStack() {
-                        // Top Bar
-                            HStack {
-                                if isPortrait() {
-                                    
-                                    Button(action: {
-                                        withAnimation {
-                                            isChapterMenuVisible.toggle()
-                                        }
-                                    }) {
-                                        Image(systemName: "line.horizontal.3")
-                                            .font(.title)
-                                    }
-                                }
-                                Spacer()
-                                Text("Gap International")
-                                    .font(.title)
-                                Spacer()
-                                NavigationLink(
-                                    destination: JournalView(isLoggedIn: $isLoggedIn, username: username),
-                                    label: {
-                                        Text("Journal")
-                                            .font(.title)
-                                    }
-                                )
+                        HStack {
+                            if isPortrait() {
                                 
                                 Button(action: {
-                                    // Add the logout functionality here
-                                    isLoggedIn = false // Log the user out
+                                    withAnimation {
+                                        isChapterMenuVisible.toggle()
+                                    }
                                 }) {
-                                    Text("Logout")
+                                    Image(systemName: "line.horizontal.3")
                                         .font(.title)
                                 }
                             }
+                            Spacer()
+                            Text("Gap International")
+                                .font(.title)
+                            Spacer()
+                            NavigationLink(
+                                destination: JournalView(isLoggedIn: $isLoggedIn, username: username),
+                                label: {
+                                    Text("Journal")
+                                        .font(.title)
+                                }
+                            )
+                            
+                            Button(action: {
+                                isLoggedIn = false
+                            }) {
+                                Text("Logout")
+                                    .font(.title)
+                            }
+                        }
                         
                         .frame(maxWidth: .infinity, maxHeight: 80)
                         
-                        // Video Display
                         if selectedChapterIndex < chapters.count {
                             VStack {
                                 Text(selectedChapter?.name ?? "")
                                     .font(.largeTitle)
                                 
                                 VideoPlayer(player: player) {
-                                    // Add buttons for play, seekbar, previous, next, PIP, etc. here
                                 }
                                 .onReceive([isPlaying].publisher) { _ in
                                     if isPlaying {
@@ -281,7 +268,7 @@ struct MainContentView: View {
                                 }, previousAction: {
                                     if selectedChapterIndex > 0 {
                                         print("Going to the previous chapter")
-
+                                        
                                         selectedChapterIndex -= 1
                                         selectedChapter = chapters[selectedChapterIndex]
                                         player = AVPlayer(url: selectedChapter!.videoURL)
@@ -296,7 +283,7 @@ struct MainContentView: View {
                                             selectedChapter = chapters[selectedChapterIndex]
                                             player = AVPlayer(url: selectedChapter!.videoURL)
                                             self.duration = selectedChapter!.videoDuration()
-                                            hasCommented = false // Reset hasCommented to false for the next chapter
+                                            hasCommented = false
                                             print("Selected chapter: \(selectedChapter?.name ?? "N/A")")
                                         }
                                     } else {
@@ -305,18 +292,15 @@ struct MainContentView: View {
                                         UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
                                     }
                                 }, pipAction: {
-                                    // Implement your PIP action here
                                 })
-                                // Update the "Save Comment" button
                                 Button(action: {
                                     guard currentTime >= duration else {
-                                        //                                        print("Cannot save comment until the video is fully over.")
                                         let alert = UIAlertController(title: "Video Not Fully Watched", message: "Cannot save comment until the video is fully over.", preferredStyle: .alert)
                                         alert.addAction(UIAlertAction(title: "OK", style: .default))
                                         UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
                                         return
                                     }
-                                    isCommentPopoverPresented = true // Show the comment popover
+                                    isCommentPopoverPresented = true
                                     hasCommented = true
                                 }) {
                                     Text("Leave A Comment")
@@ -327,7 +311,6 @@ struct MainContentView: View {
                                 }
                                 .popover(isPresented: $isCommentPopoverPresented, content: {
                                     CommentPopover(selectedChapter: $selectedChapter, commentInput: $commentInput) {
-                                        // Implement the comment saving functionality here using APIService
                                         saveComment()
                                     }
                                 })
@@ -346,20 +329,22 @@ struct MainContentView: View {
                     .padding()
                 }
             }
-            .background(Color(.systemGray4)) // Light gray background
-            .edgesIgnoringSafeArea(.all) // Remove safe area to use the full screen
+            .background(Color(.systemGray4))
+            .edgesIgnoringSafeArea(.all)
             .onAppear {
                 loadChaptersFromPlist()
-                selectedChapter = chapters.first // Load the first chapter by default
+                selectedChapter = chapters.first
             }
             .navigationBarTitle("")
             .navigationBarHidden(true)
         }
-        .navigationViewStyle(StackNavigationViewStyle()) // Utilize the full iPad screen
+        .navigationViewStyle(StackNavigationViewStyle())
     }
+    
     func isPortrait() -> Bool {
         return UIDevice.current.orientation.isPortrait
     }
+    
     func loadChaptersFromPlist() {
         if let plistURL = Bundle.main.url(forResource: "Chapters", withExtension: "plist"),
            let data = try? Data(contentsOf: plistURL),
@@ -374,13 +359,12 @@ struct MainContentView: View {
             }
         }
     }
-    // Implement the "Save Comment" functionality here
+    
     func saveComment() {
         guard let selectedChapter = selectedChapter, !commentInput.isEmpty else {
             return
         }
         
-        // You can use your APIService to save the comment
         let apiService = APIService()
         apiService.saveComment(username: username, chapterName: selectedChapter.name, comment: commentInput, level: 1) { result in
             switch result {

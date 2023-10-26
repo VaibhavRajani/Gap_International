@@ -11,23 +11,32 @@ struct JournalView: View {
     @Binding var isLoggedIn: Bool
     var username: String
 
-    @State private var userComments: [Comment] = []
+    @ObservedObject var controller = JournalController()
 
     @State private var selectedComment: Comment?
 
     var body: some View {
         NavigationView {
-            List(userComments) { comment in
+            List(controller.userComments) { comment in
                 Button(action: {
                     selectedComment = comment
                 }) {
                     VStack(alignment: .leading, spacing: 5) {
-                        Text("Chapter: \(comment.chapterName)")
-                            .font(.headline)
-                        Text("Date: \(comment.date)")
-                            .font(.caption)
+                        HStack{
+                            Text("Chapter: \(comment.chapterName)")
+                                .font(.headline)
+                                .foregroundStyle(.black)
+
+                            Spacer()
+                            Text("Date: \(comment.date)")
+                                .font(.caption)
+                                .foregroundStyle(.black)
+
+                        }
+                        
                         Text("Comment: \(comment.comment)")
                             .font(.body)
+                            .foregroundStyle(.black)
                     }
                 }
             }
@@ -47,24 +56,9 @@ struct JournalView: View {
             }
         }
         .onAppear {
-            // Load user comments
-            loadUserComments()
+            controller.loadUserComments(username: username)
         }
-        .navigationViewStyle(StackNavigationViewStyle()) // Utilize the full screen
-    }
-
-    func loadUserComments() {
-        // Call the API to get user comments
-        let apiService = APIService()
-        apiService.getUserComments(username: username) { result in
-            switch result {
-            case .success(let comments):
-                // Populate userComments with the retrieved comments
-                userComments = comments
-            case .failure(let error):
-                print("Error loading user comments: \(error)")
-            }
-        }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 

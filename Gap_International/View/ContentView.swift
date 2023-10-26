@@ -17,7 +17,6 @@ struct ContentView: View {
     var body: some View {
         if isLoggedIn {
             MainContentView(isLoggedIn: $isLoggedIn, username: username)
-         //   MainContentView()
         } else {
             LoginView(username: $username, password: $password, isLoggedIn: $isLoggedIn, loginError: $loginError, apiService: apiService)
         }

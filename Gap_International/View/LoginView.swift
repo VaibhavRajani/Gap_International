@@ -8,27 +8,21 @@
 import SwiftUI
 
 struct LoginView: View {
-    @Binding var username: String
-    @Binding var password: String
-    @Binding var isLoggedIn: Bool
-    @Binding var loginError: Bool
+    @ObservedObject var controller: LoginController
     @ObservedObject var apiService: APIService
     @State private var isSignUp = false
-    @State private var signUpUsername: String = ""
-    @State private var signUpPassword: String = ""
-    @State private var isShowingAlert = false
+
     
     var body: some View {
         NavigationLink("", destination: EmptyView())
         VStack {
-            Image("gap") // Replace with your image name
+            Image("gap")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 500, height: 200) // Adjust the size as needed
+                .frame(width: 500, height: 200)
                 .padding()
             
             if isSignUp {
-                // Sign-up form
                 TextField("Username", text: $signUpUsername)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
@@ -38,18 +32,8 @@ struct LoginView: View {
                     .padding()
                 
                 Button("Sign Up") {
-                    apiService.signUp(username: signUpUsername, password: signUpPassword) { result in
-                        switch result {
-                        case .success(let response):
-                            if response == "Success" {
-                                isLoggedIn = true
-                            } else {
-                                loginError = true
-                            }
-                        case .failure:
-                            loginError = true
-                        }
-                    }
+                    controller.signUp(signUpUsername: signUpUsername, signUpPassword: signUpPassword)
+
                 }
                 .buttonStyle(DefaultButtonStyle(backgroundColor: Color.gray))
                 
@@ -58,7 +42,6 @@ struct LoginView: View {
                 }
                 .buttonStyle(DefaultButtonStyle(backgroundColor: Color.gray))
             } else {
-                // Login form
                 TextField("Username", text: $username)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
@@ -69,24 +52,7 @@ struct LoginView: View {
                 
                 HStack {
                     Button("Login") {
-                        apiService.login(username: username, password: password) { result in
-                            switch result {
-                            case .success(let response):
-                                print("Login Response: \(response)")
-                                if response.contains("success"){
-                                    isLoggedIn = true
-                                    print("User logged in successfully")
-                                    print(isLoggedIn)
-                                } else {
-                                    loginError = true
-                                    print("Login Error")
-                                    isShowingAlert = true
-                                }
-                            case .failure(let error):
-                                print("Login Error: \(error)")
-                                loginError = true
-                            }
-                        }
+                        controller.login()
                     }
                     .buttonStyle(DefaultButtonStyle(backgroundColor: Color.gray))
                     
