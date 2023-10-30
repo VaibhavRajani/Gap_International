@@ -11,7 +11,7 @@ import AVFoundation
 import Combine
 
 struct CommentPopover: View {
-    @Binding var selectedChapter: Chapter?
+    @Binding var selectedChapter: Chapter?			
     @Binding var commentInput: String
     var saveAction: () -> Void
     @State private var isPopoverPresented = true
@@ -79,7 +79,9 @@ struct VideoControlBar: View {
     var pipAction: () -> Void
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @Binding var isVideoOver: Bool
+    @StateObject var controller = MainContentViewController()
     
+
     var body: some View {
         HStack {
             Spacer()
@@ -104,6 +106,8 @@ struct VideoControlBar: View {
                     if(currentTime > duration - 1 && currentTime < duration){
                         print("Video over")
                         isVideoOver = true
+                        controller.selectedChapterIndex += 1
+                        print($controller.selectedChapterIndex)
                     }
                 }
             })
@@ -138,21 +142,13 @@ struct VideoControlBar: View {
 }
 
 struct MainContentView: View {
-    @State private var isChapterMenuVisible = true
-    //   @State private var selectedChapter: Chapter?
-    //    @State private var player: AVPlayer?
     @State private var userComment = ""
     @Binding var isLoggedIn: Bool
     var username: String
     @State private var isPlaying = false
-    //  @State private var currentTime = 0.0
-    //    @State private var duration = 0.0
-    //    @State private var selectedChapterIndex: Int = 0
     @State private var commentInput = ""
     @State var isCommentPopoverPresented = false
-    //   @State private var hasCommented = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    //    @State private var isVideoOver = false
     @StateObject var controller = MainContentViewController()
     
     
@@ -161,7 +157,7 @@ struct MainContentView: View {
             ZStack {
                 HStack(spacing: 0) {
                     // Sidebar (Chapter Menu)
-                    if isChapterMenuVisible {
+                    if controller.isChapterMenuVisible {
                         VStack {
                             List(controller.chapters) { chapter in
                                 Button(action: {
@@ -191,7 +187,7 @@ struct MainContentView: View {
                             if controller.isPortrait() {
                                 Button(action: {
                                     withAnimation {
-                                        isChapterMenuVisible.toggle()
+                                        controller.isChapterMenuVisible.toggle()
                                     }
                                 }) {
                                     Image(systemName: "line.horizontal.3")
@@ -253,10 +249,12 @@ struct MainContentView: View {
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                                 if controller.isVideoOver {
-                                    CommentPopover(selectedChapter: $controller.selectedChapter, commentInput: $commentInput) {
+                                    CommentPopover(selectedChapter:
+                                        $controller.selectedChapter, commentInput: $commentInput) {
                                         saveComment()
                                         controller.isVideoOver = false
                                         controller.hasCommented = true
+                                        controller.selectedChapterIndex += 1
                                     }
                                 }
                             }
@@ -277,7 +275,7 @@ struct MainContentView: View {
             .edgesIgnoringSafeArea(.all)
             .onAppear {
                 controller.loadChaptersFromPlist()
-                controller.selectedChapter = controller.chapters.first
+                controller.selectedChapter = controller.chapters[controller.selectedChapterIndex]
             }
             .navigationBarTitle("")
             .navigationBarHidden(true)
@@ -304,18 +302,7 @@ struct MainContentView: View {
     }
 }
 
-extension AVPlayer {
-    func currentItemDuration() -> Double {
-        return currentItem?.duration.seconds ?? 0
-    }
-}
 
-extension Chapter {
-    func videoDuration() -> Double {
-        let asset = AVURLAsset(url: videoURL)
-        return asset.duration.seconds
-    }
-}
 
 #Preview{
     ContentView()

@@ -10,90 +10,57 @@ import Foundation
 class APIService: ObservableObject {
     private let baseURL = "https://gapinternationalwebapi20200521010239.azurewebsites.net/api"
     
-    func login(username: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
-        let loginURL = URL(string: "\(baseURL)/User/UserLogin")!
-        
-        var request = URLRequest(url: loginURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body: [String: Any] = ["UserName": username, "Password": password]
-        let jsonData = try? JSONSerialization.data(withJSONObject: body)
-        request.httpBody = jsonData
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Login Error: \(error)")
-                completion(.failure(error))
-                return
+    private func makeRequest<T: Encodable>(urlString: String, httpMethod: String, body: T, completion: @escaping (Result<String, Error>) -> Void) {
+        if let url = URL(string: urlString) {
+            var request = URLRequest(url: url)
+            request.httpMethod = httpMethod
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            let encoder = JSONEncoder()
+            if let jsonData = try? encoder.encode(body) {
+                request.httpBody = jsonData
             }
             
-            if let data = data, let response = String(data: data, encoding: .utf8) {
-                print("Login Response: \(response)")
-                completion(.success(response))
-            }
-        }.resume()
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error: \(error)")
+                    completion(.failure(error))
+                    return
+                }
+                
+                if let data = data, let response = String(data: data, encoding: .utf8) {
+                    print("Response: \(response)")
+                    completion(.success(response))
+                }
+            }.resume()
+        } else {
+            // Handle invalid URL
+            completion(.failure(NSError(domain: "InvalidURL", code: 0, userInfo: nil)))
+        }
+    }
+    
+    func login(username: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
+        let loginURL = "\(baseURL)/User/UserLogin"
+        let request = LoginRequest(userName: username, password: password)
+        
+        makeRequest(urlString: loginURL, httpMethod: "POST", body: request, completion: completion)
     }
     
     func signUp(username: String, password: String, completion: @escaping (Result<String, Error>) -> Void) {
-        let signUpURL = URL(string: "\(baseURL)/User/CreateUserAccount")!
+        let signUpURL = "\(baseURL)/User/CreateUserAccount"
+        let request = SignUpRequest(userName: username, password: password)
         
-        var request = URLRequest(url: signUpURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body: [String: Any] = ["UserName": username, "Password": password]
-        let jsonData = try? JSONSerialization.data(withJSONObject: body)
-        request.httpBody = jsonData
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Sign Up Error: \(error)")
-                completion(.failure(error))
-                return
-            }
-            
-            if let data = data, let response = String(data: data, encoding: .utf8) {
-                print("Sign Up Response: \(response)")
-                completion(.success(response))
-            }
-        }.resume()
-        
-        
+        makeRequest(urlString: signUpURL, httpMethod: "POST", body: request, completion: completion)
     }
     
     func saveComment(username: String, chapterName: String, comment: String, level: Int, completion: @escaping (Result<String, Error>) -> Void) {
-        let saveCommentURL = URL(string: "\(baseURL)/User/SaveJournal")!
+        let saveCommentURL = "\(baseURL)/User/SaveJournal"
+        let request = SaveCommentRequest(userName: username, chapterName: chapterName, comment: comment, level: level)
         
-        var request = URLRequest(url: saveCommentURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body: [String: Any] = [
-            "UserName": username,
-            "ChapterName": chapterName,
-            "Comment": comment,
-            "Level": level
-        ]
-        let jsonData = try? JSONSerialization.data(withJSONObject: body)
-        request.httpBody = jsonData
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Save Comment Error: \(error)")
-                completion(.failure(error))
-                return
-            }
-            
-            if let data = data, let response = String(data: data, encoding: .utf8) {
-                print("Save Comment Response: \(response)")
-                completion(.success(response))
-            }
-        }.resume()
+        makeRequest(urlString: saveCommentURL, httpMethod: "POST", body: request, completion: completion)
     }
     
-    func getUserComments(username: String, completion: @escaping (Result<[Comment], Error>) -> Void) {
-        let urlString = "\(baseURL)/User/GetJournal?UserName=\(username)"
+    func fetchData<T: Decodable>(from urlString: String, responseType: T.Type, completion: @escaping (Result<T, Error>) -> Void) {
         guard let url = URL(string: urlString) else {
             completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
             return
@@ -108,8 +75,8 @@ class APIService: ObservableObject {
             if let data = data {
                 do {
                     let decoder = JSONDecoder()
-                    let comments = try decoder.decode([Comment].self, from: data)
-                    completion(.success(comments))
+                    let decodedData = try decoder.decode(T.self, from: data)
+                    completion(.success(decodedData))
                 } catch {
                     completion(.failure(error))
                 }
@@ -117,5 +84,11 @@ class APIService: ObservableObject {
         }.resume()
     }
 
+    func getUserComments(username: String, completion: @escaping (Result<[Comment], Error>) -> Void) {
+        let urlString = "\(baseURL)/User/GetJournal?UserName=\(username)"
 
+        fetchData(from: urlString, responseType: [Comment].self, completion: completion)
+    }
+
+    
 }

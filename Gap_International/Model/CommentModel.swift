@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Comment: Identifiable, Decodable {
+struct Comment: Identifiable, Codable {
     var chapterName: String
     var comment: String
     var level: Int
@@ -23,4 +23,14 @@ struct Comment: Identifiable, Decodable {
         case level = "Level"
         case date = "Date"
     }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(chapterName, forKey: .chapterName)
+        try container.encode(comment, forKey: .comment)
+        try container.encode(level, forKey: .level)
+        try container.encode(date, forKey: .date)
+    }
+    
 }

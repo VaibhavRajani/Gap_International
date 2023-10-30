@@ -15,7 +15,7 @@ struct ContentView: View {
     
     var body: some View {
         if loginController.isLoggedIn {
-                    MainContentView(isLoggedIn: $loginController.isLoggedIn, username: username)
+            MainContentView(isLoggedIn: $loginController.isLoggedIn, username: username)
                 } else {
                     LoginView(controller: loginController, username: $username, password: $password)
         }

@@ -7,10 +7,7 @@
 
 import XCTest
 @testable import Gap_International
-import SwiftUI
-import AVKit
-import AVFoundation
-import Combine
+
 
 final class Gap_InternationalTests: XCTestCase {
     override func setUpWithError() throws {
@@ -38,111 +35,7 @@ final class Gap_InternationalTests: XCTestCase {
 
 }
 
-class APIServiceTests: XCTestCase {
-    
-    func testLogin() {
-        let apiService = APIService()
-        
-        let expectation = XCTestExpectation(description: "Login completion")
-        
-        apiService.login(username: "testUser", password: "testPassword") { result in
-            switch result {
-            case .success(let response):
-                XCTAssertEqual(response, "Success")
-            case .failure:
-                XCTFail("Login should not fail")
-            }
-            expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 5.0)
-    }
 
-    func testSignUp() {
-        let apiService = APIService()
-        
-        let expectation = XCTestExpectation(description: "Sign-up completion")
-        
-        apiService.signUp(username: "testUser", password: "testPassword") { result in
-            switch result {
-            case .success(let response):
-                XCTAssertEqual(response, "Success")
-            case .failure:
-                XCTFail("Sign-up should not fail")
-            }
-            expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 5.0)
-    }
-    
-    func testSaveComment() {
-        let apiService = APIService()
-        
-        let expectation = XCTestExpectation(description: "Save comment completion")
-        
-        apiService.saveComment(username: "testUser", chapterName: "Chapter1", comment: "Test comment", level: 1) { result in
-            switch result {
-            case .success(let response):
-                XCTAssertEqual(response, "Comment saved successfully")
-            case .failure:
-                XCTFail("Save comment should not fail")
-            }
-            expectation.fulfill()
-        }
-        
-        wait(for: [expectation], timeout: 5.0)
-    }
-}
 
-class MainContentViewTests: XCTestCase{
-    
-    func testNextActionWhenVideoOver() {
-        let controller = MainContentViewController()
-        controller.selectedChapterIndex = 0
-        controller.hasCommented = true
-        controller.chapters = [Chapter(name: "Chapter1", videoURL: URL(string: "https://example.com/video1.mp4")!), Chapter(name: "Chapter2", videoURL: URL(string: "https://example.com/video2.mp4")!)]
-        
-        controller.nextAction()
-        
-        XCTAssertEqual(controller.selectedChapterIndex, 1)
-    }
-    
-    func testNextActionWhenVideoNotOver() {
-        let controller = MainContentViewController()
-        controller.selectedChapterIndex = 0
-        controller.hasCommented = false
-        controller.chapters = [Chapter(name: "Chapter1", videoURL: URL(string: "https://example.com/video1.mp4")!), Chapter(name: "Chapter2", videoURL: URL(string: "https://example.com/video2.mp4")!)]
-        
-        controller.nextAction()
-        
-        XCTAssertEqual(controller.selectedChapterIndex, 0)
-    }
-    
-    func testSideBarWhenOver() {
-        let controller = MainContentViewController()
-        controller.selectedChapterIndex = 0
-        controller.hasCommented = true
-        controller.chapters = [Chapter(name: "Chapter1", videoURL: URL(string: "https://example.com/video1.mp4")!), Chapter(name: "Chapter2", videoURL: URL(string: "https://example.com/video2.mp4")!)]
-        controller.currentTime = 21
-        controller.duration = 20
-        
-        controller.sideBar()
-        
-        XCTAssertEqual(controller.selectedChapterIndex, 1)
-    }
 
-    func testSideBarWhenOverWithoutComment() {
-        let controller = MainContentViewController()
-        controller.selectedChapterIndex = 0
-        controller.hasCommented = false
-        controller.chapters = [Chapter(name: "Chapter1", videoURL: URL(string: "https://example.com/video1.mp4")!), Chapter(name: "Chapter2", videoURL: URL(string: "https://example.com/video2.mp4")!)]
-        controller.currentTime = 21
-        controller.duration = 20
-        
-        controller.sideBar()
-        
-        XCTAssertEqual(controller.selectedChapterIndex, 0)
-    }
-}
 

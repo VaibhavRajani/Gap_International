@@ -18,6 +18,7 @@ class MainContentViewController: ObservableObject {
     @Published var hasCommented = false
     @Published var isVideoOver = false
     @Published var currentTime = 0.0
+    @Published var isChapterMenuVisible = true
 
     func loadChaptersFromPlist() {
         if let plistURL = Bundle.main.url(forResource: "Chapters", withExtension: "plist"),
@@ -53,14 +54,17 @@ class MainContentViewController: ObservableObject {
     func nextAction(){
         if hasCommented {
             if selectedChapterIndex < chapters.count - 1 {
+                print(selectedChapterIndex)
                 print("Going to the next chapter")
-                selectedChapterIndex += 1
+           //     selectedChapterIndex += 1
                 selectedChapter = chapters[selectedChapterIndex]
                 player = AVPlayer(url: selectedChapter!.videoURL)
                 self.duration = selectedChapter!.videoDuration()
                 hasCommented = false
                 isVideoOver = false
                 print("Selected chapter: \(selectedChapter?.name ?? "N/A")")
+                print(selectedChapterIndex)
+
             }
         } else {
             let alert = UIAlertController(title: "Comment Required", message: "Please leave a comment before proceeding to the next chapter.", preferredStyle: .alert)
@@ -91,5 +95,18 @@ class MainContentViewController: ObservableObject {
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
         }
+    }
+}
+
+extension AVPlayer {
+    func currentItemDuration() -> Double {
+        return currentItem?.duration.seconds ?? 0
+    }
+}
+
+extension Chapter {
+    func videoDuration() -> Double {
+        let asset = AVURLAsset(url: videoURL)
+        return asset.duration.seconds
     }
 }

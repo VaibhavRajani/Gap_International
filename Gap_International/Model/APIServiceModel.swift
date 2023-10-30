@@ -6,3 +6,20 @@
 //
 
 import Foundation
+
+struct LoginRequest: Encodable {
+    let userName: String
+    let password: String
+}
+
+struct SignUpRequest: Encodable {
+    let userName: String
+    let password: String
+}
+
+struct SaveCommentRequest: Encodable {
+    let userName: String
+    let chapterName: String
+    let comment: String
+    let level: Int
+}
